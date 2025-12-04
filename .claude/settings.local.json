@@ -8,7 +8,14 @@
       "Bash(git checkout:*)",
       "Bash(npm install:*)",
       "Bash(npm run build:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nfeat: CLG Launcher - Adaptation pour le Club Informatique du Collège\n\n- Ajout d''un onglet serveur dédié avec connexion automatique (179.61.190.50:25565)\n- Affichage du nombre de joueurs en ligne sur le serveur\n- Comptes offline uniquement (suppression de l''authentification Microsoft)\n- Suppression des liens sociaux et posts de blog\n- Désactivation de Discord Rich Presence\n- Suppression de la vérification API OriLauncher\n- Version Minecraft fixée à 1.19.4 pour le serveur\n- Traductions FR/EN mises à jour\n\n🤖 Generated with [Claude Code](https://claude.ai/code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git push:*)",
+      "Bash(npm run dist:win:*)",
+      "Bash(CSC_IDENTITY_AUTO_DISCOVERY=false WIN_CSC_LINK=\"\" npm run dist:win)",
+      "Bash(git commit:*)",
+      "Bash(gh release create:*)",
+      "Bash(gh release edit v0.0.1-beta --notes \"$(cat <<''EOF''\n## CLG Launcher v0.0.1-beta\n\nPremière version beta du launcher Minecraft pour le Club Informatique du Collège Madame Epinay.\n\n### Fonctionnalités\n\n- **Connexion automatique au serveur** (179.61.190.50:25565) en Minecraft 1.19.4\n- **Onglet Serveur dédié** avec affichage du nombre de joueurs en ligne\n- **Comptes offline uniquement** - pas besoin de compte Microsoft\n- **Gestion d''instances** pour jouer en Vanilla, Forge ou Fabric\n- **Interface moderne** avec plusieurs thèmes disponibles\n- **Installation automatique de Java** si nécessaire\n\n### Installation\n\n1. Téléchargez `CLG Launcher-0.0.1-beta-portable.exe`\n2. Double-cliquez pour lancer (pas d''installation nécessaire)\n3. Créez un compte offline avec votre pseudo\n4. Cliquez sur \"Rejoindre le serveur\" pour jouer!\n\n### Notes\n\n- Version portable (pas d''installation requise)\n- Windows 64-bit uniquement pour cette version\n- Java est téléchargé automatiquement au premier lancement\n\n---\n🤖 Generated with [Claude Code](https://claude.ai/code)\nEOF\n)\")"
     ],
     "deny": [],
     "ask": []

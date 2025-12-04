@@ -1,7 +1,6 @@
 // @ts-nocheck
 /**
- * @author Cosmic-fi
- * @description Update checker utility for the OriLauncher Front-End application.
+ * @description Update checker utility for CLG Launcher.
  */
 
 import { t } from '../stores/i18n.js';
@@ -10,16 +9,20 @@ import { showDialog } from '../stores/ui.js';
 let translate = (key) => key;
 t.subscribe(fn => translate = fn);
 
+// GitHub repository configuration
+const GITHUB_OWNER = 'BourezBastien';
+const GITHUB_REPO = 'ClgLauncher';
+
 // Manual version check from GitHub releases
 export async function checkForUpdate() {
   try {
     const currentVersion = await window.electron.invoke('get-app-version');
-    
+
     // Fetch latest release from GitHub API
-    const response = await fetch('https://api.github.com/repos/cosmic-fi/Ori-Launcher/releases/latest', {
+    const response = await fetch(`https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/releases/latest`, {
       headers: {
         'Accept': 'application/vnd.github.v3+json',
-        'User-Agent': 'OriLauncher/2.0.0'
+        'User-Agent': 'CLGLauncher/1.0.0'
       }
     });
     
@@ -64,7 +67,7 @@ export async function showUpdateNotification(updateInfo) {
           label: translate('notifications.updateNow'),
           type: 'confirm',
           action: () => {
-            window.electron.openExternal(updateInfo.downloadUrl || 'https://orilauncher.cosmicfi.dev/download');
+            window.electron.openExternal(updateInfo.downloadUrl || `https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/releases/latest`);
             resolve(true); 
           }
         },
