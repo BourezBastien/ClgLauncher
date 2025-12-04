@@ -12,8 +12,7 @@
     import { currentLocale, t } from "../../stores/i18n";
     import { appVersion } from "../../utils/version";
     import ThemeCard from "../ui/ThemeCard.svelte";
-    import { discordRPCManager } from '../../utils/discordRPCManager.js';
-    import { notificationService } from "../../services/notificationService";
+        import { notificationService } from "../../services/notificationService";
     import { checkForUpdate, showUpdateNotification } from "../../utils/updateChecker.js";
     import BetaTag from "../ui/BetaTag.svelte";
 
@@ -60,18 +59,6 @@
         { value: 'fr', label: 'Français' },
         { value: 'es', label: 'Español' }
     ];
-    $: {
-        if ($settings?.launcher?.integration?.discordRichPresence?.value !== undefined) {
-            const isEnabled = $settings.launcher?.integration?.discordRichPresence?.value;
-            discordRPCManager.updateSettings(isEnabled).then(() => {
-                if (isEnabled) {
-                    discordRPCManager.refreshActivity();
-                }
-            }).catch(error => {
-                console.error('Failed to update Discord RPC settings:', error);
-            });
-        }
-    };
 
     function setTab(tab) {
         activeTab = tab;
@@ -490,23 +477,6 @@
                                     on:change={(e) => settings.updatePath('launcher.updates.checkForUpdates', e.detail.checked)}
                                 />
                             </div>                      
-                        </div>
-                        <hr class="setting-seperator">
-                        <div class="setting-item-group">
-                            <span class="group-sub-label">{$t('settings.launcher.integration.label')}</span>
-                            <div class="sub-item-group">
-                                <div class="toggle-label-group">
-                                    <span class="toggle-label">
-                                        {$t('settings.launcher.integration.discordRPC')}
-                                        <BetaTag />
-                                    </span>
-                                    <span class="group-description">{$t('settings.launcher.integration.discordRPCDescription')}</span>
-                                </div>
-                                <ToggleButton
-                                    checked={$settings.launcher?.integration?.discordRichPresence?.value}
-                                    on:change={(e) => settings.updatePath('launcher.integration.discordRichPresence', e.detail.checked)}
-                                />
-                            </div>
                         </div>
                         <hr class="setting-seperator">
                         <div class="setting-item-group">

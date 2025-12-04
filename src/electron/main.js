@@ -20,7 +20,8 @@ const __dirname = path.dirname(__filename);
 import { setAppWindow, getAppWindow, closeAppWindow } from './window/appWindow.js';
 import { Launch } from "ori-mcc";
 import { execSync } from "child_process";
-import { discordRPC } from './utils/discordRPC.js';
+// Discord RPC disabled for CLG Launcher
+// import { discordRPC } from './utils/discordRPC.js';
 
 // Auto-updater configuration
 autoUpdater.autoDownload = true;
@@ -409,51 +410,30 @@ const setupIpcHandlers = () => {
         }
     });
 
-    // DISCORD RPC HANDLERS
+    // DISCORD RPC HANDLERS - Disabled for CLG Launcher
     ipcMain.handle('discord-rpc-init', async () => {
-        try {
-            await discordRPC.initialize();
-            return { success: true };
-        } catch (error) {
-            console.error('Discord RPC initialization failed:', error);
-            return { success: false, error: error.message };
-        }
+        return { success: false, error: 'Discord RPC disabled' };
     });
     ipcMain.handle('discord-rpc-disconnect', async () => {
-        try {
-            await discordRPC.disconnect();
-            return { success: true };
-        } catch (error) {
-            console.error('Discord RPC disconnect failed:', error);
-            return { success: false, error: error.message };
-        }
+        return { success: true };
     });
     ipcMain.handle('discord-rpc-set-idle', () => {
-        discordRPC.setIdleActivity();
         return { success: true };
     });
     ipcMain.handle('discord-rpc-set-launching', (event, version, variant) => {
-        discordRPC.setLaunchingActivity(version, variant);
         return { success: true };
     });
     ipcMain.handle('discord-rpc-set-playing', (event, version, variant, username) => {
-        discordRPC.setPlayingActivity(version, variant, username);
         return { success: true };
     });
     ipcMain.handle('discord-rpc-set-downloading', (event, progress, version) => {
-        discordRPC.setDownloadingActivity(progress, version);
         return { success: true };
     });
     ipcMain.handle('discord-rpc-clear', async () => {
-        try {
-            await discordRPC.clearActivity();
-            return { success: true };
-        } catch (error) {
-            return { success: false, error: error.message };
-        }
+        return { success: true };
     });
     ipcMain.handle('discord-rpc-status', () => {
-        return discordRPC.getStatus();
+        return { isConnected: false, currentActivity: null };
     });
 
     // SYSTEM NOTIFICATION HANDLERS

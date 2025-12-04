@@ -117,8 +117,7 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            row-gap: 20vh;
-            padding: 4vh 0;
+            padding: 2vh 0;
             flex-grow: 1;
 
             .btn-group {
