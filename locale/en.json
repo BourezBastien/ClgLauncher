@@ -184,6 +184,7 @@
   },
   "mainContent": {
     "playersOnline": "Players online now",
+    "serverPlayers": "on server",
     "supportProject": "Support Project",
     "console": "Console",
     "minimize": "Minimize",
@@ -235,12 +236,24 @@
     "buttons": {
       "play": "Play",
       "home": "Home",
+      "server": "Server",
       "accountManager": "Account Manager",
       "instanceManager": "Instance Manager",
       "mods": "Mods (Coming soon)",
       "quickServers": "Quick Servers (Coming soon)"
     },
     "settings": "Settings"
+  },
+  "server": {
+    "title": "Club Informatique Server",
+    "online": "Online",
+    "offline": "Offline",
+    "players": "players",
+    "version": "Version",
+    "onlinePlayers": "Online Players",
+    "joinServer": "Join Server",
+    "serverOffline": "Server Offline",
+    "playing": "Playing"
   },
   "accountAdder": {
     "selectAccountType": "Select Account Type",

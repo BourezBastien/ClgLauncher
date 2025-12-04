@@ -187,6 +187,7 @@
   },
   "mainContent": {
     "playersOnline": "Joueurs en ligne maintenant",
+    "serverPlayers": "sur le serveur",
     "supportProject": "Soutenir le projet",
     "console": "Console",
     "minimize": "Réduire",
@@ -238,12 +239,24 @@
     "buttons": {
       "play": "Jouer",
       "home": "Accueil",
+      "server": "Serveur",
       "accountManager": "Gestionnaire de Comptes",
       "instanceManager": "Gestionnaire d'Instances",
       "mods": "Mods (Bientôt disponible)",
       "quickServers": "Serveurs rapides (Bientôt disponible)"
     },
     "settings": "Paramètres"
+  },
+  "server": {
+    "title": "Serveur Club Informatique",
+    "online": "En ligne",
+    "offline": "Hors ligne",
+    "players": "joueurs",
+    "version": "Version",
+    "onlinePlayers": "Joueurs en ligne",
+    "joinServer": "Rejoindre le serveur",
+    "serverOffline": "Serveur hors ligne",
+    "playing": "En jeu"
   },
   "accountAdder": {
     "selectAccountType": "Sélectionnez le type de compte",

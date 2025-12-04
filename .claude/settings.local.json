@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cmd /c \"dir C:\\Users\\Uranium\\Documents\\Projets\\ClgLauncher\")",
+      "Bash(git ls-tree:*)",
+      "Bash(find:*)",
+      "Bash(cat:*)",
+      "Bash(git checkout:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run build:*)",
+      "Bash(git add:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
