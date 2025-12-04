@@ -112,7 +112,7 @@ const buildApp = async () => {
                         }
                     ],
                     icon: 'public/icon.ico',
-                    signAndEditExecutable: false
+                    signAndEditExecutable: true
                 },
                 nsis: {
                     oneClick: false,
