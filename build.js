@@ -115,8 +115,9 @@ const buildApp = async () => {
                     signAndEditExecutable: false
                 },
                 nsis: {
-                    oneClick: true,
-                    allowToChangeInstallationDirectory: false,
+                    oneClick: false,
+                    allowToChangeInstallationDirectory: true,
+                    perMachine: true,
                     createDesktopShortcut: true,
                     createStartMenuShortcut: true,
                     artifactName: '${productName}-${version}-setup.${ext}',
