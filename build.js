@@ -66,9 +66,9 @@ const buildApp = async () => {
         console.log('Building application...');
         await build({
             config: {
-                appId: 'dev.cosmicfi.orilauncher',
-                productName: 'OriLauncher',
-                copyright: `Copyright © ${new Date().getFullYear()} Cosmic-fi (Cosmic Boucher)`,
+                appId: 'fr.clg.launcher',
+                productName: 'CLG Launcher',
+                copyright: `Copyright © ${new Date().getFullYear()} Club Informatique CLG`,
                 forceCodeSigning: false,
                 afterSign: null,
                 publish: null,
@@ -105,23 +105,17 @@ const buildApp = async () => {
                     '**/discord-rpc/**/.*'
                 ],
                 win: {
-                    target: {
-                        target: 'nsis',
-                        arch: ['x64']
-                    },
-                    icon: 'public/icon.ico'
+                    target: [
+                        {
+                            target: 'portable',
+                            arch: ['x64']
+                        }
+                    ],
+                    icon: 'public/icon.ico',
+                    signAndEditExecutable: false
                 },
-                nsis: {
-                    oneClick: false,
-                    allowToChangeInstallationDirectory: true,
-                    createDesktopShortcut: true,
-                    createStartMenuShortcut: true,
-                    allowElevation: false,
-                    artifactName: '${productName}-${version}-${os}-${arch}.${ext}',
-                    deleteAppDataOnUninstall: true,
-                    license: 'LICENSE',
-                    installerSidebar: 'public/installerSidebar.bmp',
-                    uninstallerSidebar: 'public/uninstallerSidebar.bmp'
+                portable: {
+                    artifactName: '${productName}-${version}-portable.${ext}'
                 },
                 mac: {
                     target: [

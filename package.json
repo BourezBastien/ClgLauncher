@@ -1,15 +1,14 @@
 {
-  "name": "orilauncher",
-  "version": "1.4.0",
-  "description": "Modern Custom Minecraft launcher",
+  "name": "clglauncher",
+  "version": "0.0.1-beta",
+  "description": "Launcher Minecraft pour le Club Informatique du Collège",
   "author": {
-    "name": "Cosmic-fi (Cosmic Boucher)",
-    "email": "hello@cosmicfi.dev",
-    "url": "https://github.com/cosmic-fi"
+    "name": "Club Informatique CLG",
+    "url": "https://github.com/BourezBastien"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/cosmic-fi/OriLauncher"
+    "url": "https://github.com/BourezBastien/ClgLauncher"
   },
   "main": "src/electron/main.js",
   "type": "module",
