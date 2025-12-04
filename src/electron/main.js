@@ -25,6 +25,7 @@ import { discordRPC } from './utils/discordRPC.js';
 // Auto-updater configuration
 autoUpdater.autoDownload = true;
 autoUpdater.autoInstallOnAppQuit = true;
+autoUpdater.allowPrerelease = true;
 
 const rootDirectory = process.env.APPDATA || (process.platform === 'darwin' ? `${process.env.APPDATA}/Library/Application Support`: process.env.HOME);
 const LOG_DIR = `${rootDirectory}/.OriLauncher/logs`
