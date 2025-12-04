@@ -107,15 +107,20 @@ const buildApp = async () => {
                 win: {
                     target: [
                         {
-                            target: 'portable',
+                            target: 'nsis',
                             arch: ['x64']
                         }
                     ],
                     icon: 'public/icon.ico',
                     signAndEditExecutable: false
                 },
-                portable: {
-                    artifactName: '${productName}-${version}-portable.${ext}'
+                nsis: {
+                    oneClick: true,
+                    allowToChangeInstallationDirectory: false,
+                    createDesktopShortcut: true,
+                    createStartMenuShortcut: true,
+                    artifactName: '${productName}-${version}-setup.${ext}',
+                    deleteAppDataOnUninstall: false
                 },
                 mac: {
                     target: [
@@ -148,9 +153,9 @@ const buildApp = async () => {
                 publish: [
                     {
                         provider: 'github',
-                        owner: 'cosmic-fi',
-                        repo: 'OriLauncher',
-                        releaseType: 'draft'
+                        owner: 'BourezBastien',
+                        repo: 'ClgLauncher',
+                        releaseType: 'release'
                     }
                 ]
             }

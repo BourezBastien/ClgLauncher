@@ -1,7 +1,6 @@
 // @ts-nocheck
 /**
- * @author Cosmic-f
- * @description Main entry point for the OriLauncher application.
+ * @description Main entry point for the CLG Launcher application.
 */
 
 import{ app, ipcMain, dialog, Notification, shell } from "electron";
@@ -12,6 +11,7 @@ import os from 'os'
 import http from 'http';
 import https from 'https';
 import { fileURLToPath } from 'url';
+import { autoUpdater } from 'electron-updater';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -20,6 +20,10 @@ import { setAppWindow, getAppWindow, closeAppWindow } from './window/appWindow.j
 import { Launch } from "ori-mcc";
 import { execSync } from "child_process";
 import { discordRPC } from './utils/discordRPC.js';
+
+// Auto-updater configuration
+autoUpdater.autoDownload = true;
+autoUpdater.autoInstallOnAppQuit = true;
 
 const rootDirectory = process.env.APPDATA || (process.platform === 'darwin' ? `${process.env.APPDATA}/Library/Application Support`: process.env.HOME);
 const LOG_DIR = `${rootDirectory}/.OriLauncher/logs`
@@ -571,6 +575,93 @@ function formatEntry(entry) {
 }
 
 /**
+ * Setup auto-updater events
+ */
+const setupAutoUpdater = () => {
+    autoUpdater.on('checking-for-update', () => {
+        console.log('Checking for updates...');
+        const mainWindow = getAppWindow();
+        if (mainWindow) {
+            mainWindow.webContents.send('update-status', { status: 'checking' });
+        }
+    });
+
+    autoUpdater.on('update-available', (info) => {
+        console.log('Update available:', info.version);
+        const mainWindow = getAppWindow();
+        if (mainWindow) {
+            mainWindow.webContents.send('update-status', {
+                status: 'available',
+                version: info.version
+            });
+        }
+    });
+
+    autoUpdater.on('update-not-available', () => {
+        console.log('No updates available');
+        const mainWindow = getAppWindow();
+        if (mainWindow) {
+            mainWindow.webContents.send('update-status', { status: 'not-available' });
+        }
+    });
+
+    autoUpdater.on('download-progress', (progress) => {
+        console.log(`Download progress: ${progress.percent.toFixed(1)}%`);
+        const mainWindow = getAppWindow();
+        if (mainWindow) {
+            mainWindow.webContents.send('update-status', {
+                status: 'downloading',
+                percent: progress.percent,
+                bytesPerSecond: progress.bytesPerSecond,
+                transferred: progress.transferred,
+                total: progress.total
+            });
+        }
+    });
+
+    autoUpdater.on('update-downloaded', (info) => {
+        console.log('Update downloaded:', info.version);
+        const mainWindow = getAppWindow();
+        if (mainWindow) {
+            mainWindow.webContents.send('update-status', {
+                status: 'downloaded',
+                version: info.version
+            });
+        }
+        // Show notification to user
+        new Notification({
+            title: 'Mise à jour prête',
+            body: `La version ${info.version} sera installée au prochain redémarrage.`
+        }).show();
+    });
+
+    autoUpdater.on('error', (error) => {
+        console.error('Auto-updater error:', error);
+        const mainWindow = getAppWindow();
+        if (mainWindow) {
+            mainWindow.webContents.send('update-status', {
+                status: 'error',
+                error: error.message
+            });
+        }
+    });
+
+    // IPC handlers for manual update control
+    ipcMain.handle('check-for-updates', async () => {
+        try {
+            const result = await autoUpdater.checkForUpdates();
+            return { success: true, result };
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
+    });
+
+    ipcMain.handle('install-update', () => {
+        autoUpdater.quitAndInstall(false, true);
+    });
+};
+
+/**
  * Initializes the application.
 */
 const initializeApp = async () => {
@@ -581,7 +672,7 @@ const initializeApp = async () => {
     }
 
     app.disableHardwareAcceleration();
-    
+
     app.on("second-instance", () => {
         const mainWindow = getAppWindow();
         if (mainWindow) {
@@ -601,7 +692,15 @@ const initializeApp = async () => {
     try {
         await app.whenReady();
         setupIpcHandlers();
+        setupAutoUpdater();
         setAppWindow();
+
+        // Check for updates after window is ready (with delay)
+        setTimeout(() => {
+            autoUpdater.checkForUpdates().catch(err => {
+                console.log('Auto-update check failed:', err.message);
+            });
+        }, 3000);
     } catch (error) {
         console.error("Error during app initialization:", error);
         app.quit();

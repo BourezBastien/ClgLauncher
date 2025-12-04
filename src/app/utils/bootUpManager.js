@@ -30,27 +30,17 @@ async function loadSettingsStep() {
     await applySystemSettings();
 }
 
-// Check for updates
+// Check for updates - now handled by electron-updater automatically
 async function checkForUpdatesStep() {
     const currentSettings = get(settings);
     if (currentSettings.launcher?.updates?.checkForUpdates?.value) {
         bootStatus.set({ step: 2, message: translate('logs.checkingForUpdates'), progress: 25 });
-        
-        // Use our manual version check instead of electron-updater
-        const updateInfo = await checkForUpdate();
-        
-        if (updateInfo?.available) {
-          console.log(`Update available: ${updateInfo.latest} (current: ${updateInfo.current})`);
-          
-          // Pause boot sequence and wait for user decision
-          await showUpdateNotification(updateInfo);
-        } else if (updateInfo) {
-          console.log('Launcher is up to date');
-        }
+        // electron-updater handles this automatically in background
+        console.log('Auto-updater will check for updates in background...');
     } else {
         bootStatus.set({ step: 2, message: translate('logs.skippingUpdateCheck'), progress: 25 });
     }
-    await new Promise(res => setTimeout(res, 500));
+    await new Promise(res => setTimeout(res, 300));
 }
 
 async function checkForVersions() {
