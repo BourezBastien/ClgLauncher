@@ -2,6 +2,7 @@ import { build } from 'electron-builder';
 import { promises as fsPromises } from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
+import rcedit from 'rcedit';
 
 const args = process.argv.slice(2);
 const shouldBuild = args.includes('--build=platform');
@@ -71,6 +72,7 @@ const buildApp = async () => {
                 copyright: `Copyright © ${new Date().getFullYear()} Club Informatique CLG`,
                 forceCodeSigning: false,
                 afterSign: null,
+                afterPack: setExeIcon,
                 publish: null,
                 artifactName: '${productName}-${version}-${os}-${arch}.${ext}',
                 extraMetadata: {
@@ -112,7 +114,8 @@ const buildApp = async () => {
                         }
                     ],
                     icon: 'public/icon.ico',
-                    signAndEditExecutable: true
+                    signAndEditExecutable: false,
+                    requestedExecutionLevel: 'asInvoker'
                 },
                 nsis: {
                     oneClick: false,
@@ -177,6 +180,28 @@ const buildFrontend = async () => {
     } catch (error) {
         console.error('Frontend build failed:', error);
         return false;
+    }
+};
+
+const setExeIcon = async (context) => {
+    if (context.electronPlatformName !== 'win32') return;
+
+    const exePath = path.join(context.appOutDir, 'CLG Launcher.exe');
+    const iconPath = path.join(process.cwd(), 'public', 'icon.ico');
+
+    try {
+        console.log('Setting executable icon with rcedit...');
+        await rcedit(exePath, {
+            icon: iconPath,
+            'version-string': {
+                'ProductName': 'CLG Launcher',
+                'FileDescription': 'CLG Launcher - Minecraft Launcher',
+                'CompanyName': 'Club Informatique CLG'
+            }
+        });
+        console.log('Icon set successfully!');
+    } catch (error) {
+        console.warn('Warning: Could not set icon:', error.message);
     }
 };
 
