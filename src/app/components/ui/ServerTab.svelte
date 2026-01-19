@@ -20,6 +20,20 @@
 
     let { hasAccount } = userAccountState;
 
+    // Helper function to compare Minecraft versions
+    function isVersionGreaterOrEqual(version, target) {
+        const vParts = version.split('.').map(Number);
+        const tParts = target.split('.').map(Number);
+
+        for (let i = 0; i < Math.max(vParts.length, tParts.length); i++) {
+            const v = vParts[i] || 0;
+            const t = tParts[i] || 0;
+            if (v > t) return true;
+            if (v < t) return false;
+        }
+        return true;
+    }
+
     // Server status
     let serverStatus = {
         online: false,
@@ -81,9 +95,19 @@
 
             // Build game arguments with server auto-connect
             let gameArgs = $settings.game.runtime.gameArgs.value ? $settings.game.runtime.gameArgs.value.split(' ') : [];
-            // Add server connection arguments
-            gameArgs.push('--server', serverIp);
-            gameArgs.push('--port', String(serverPort));
+
+            // Add server connection arguments based on Minecraft version
+            // For Minecraft 1.20+, use quickPlayMultiplayer instead of --server/--port
+            const isModernVersion = isVersionGreaterOrEqual(serverVersion, '1.20.0');
+
+            if (isModernVersion) {
+                // Minecraft 1.20+ uses Quick Play system
+                gameArgs.push('--quickPlayMultiplayer', `${serverIp}:${serverPort}`);
+            } else {
+                // Older versions use --server and --port
+                gameArgs.push('--server', serverIp);
+                gameArgs.push('--port', String(serverPort));
+            }
 
             let launchOptions = {
                 url: null,
