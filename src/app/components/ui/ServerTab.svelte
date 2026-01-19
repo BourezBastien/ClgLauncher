@@ -3,7 +3,8 @@
     import { onMount, onDestroy } from 'svelte';
     import { selectedAccountUsername, userAccountState } from "../../stores/account";
     import { uiState, showToast } from "../../stores/ui";
-    import { fetchServerStatus, SERVER_IP, SERVER_PORT } from "../../services/api";
+    import { fetchServerStatus, getServerIP, getServerPort, initServerConfig } from "../../services/api";
+    import { getServerMinecraftVersion } from "../../services/remoteConfig";
     import { t } from "../../stores/i18n";
     import { getSelectedAccount } from "../../shared/user";
     import { settings } from "../../stores/settings";
@@ -29,10 +30,19 @@
     };
     let statusInterval;
 
-    // Server version to launch
-    const SERVER_VERSION = '1.19.4';
+    // Server version to launch - loaded from remote config
+    let serverVersion = '1.19.4';
+    let serverIp = '179.61.190.50';
+    let serverPort = 25565;
 
     onMount(async () => {
+        // Initialize server configuration from remote
+        await initServerConfig();
+        serverIp = getServerIP();
+        serverPort = getServerPort();
+        serverVersion = await getServerMinecraftVersion();
+        console.log(`[ServerTab] Config loaded: ${serverIp}:${serverPort}, version ${serverVersion}`);
+
         await updateServerStatus();
         statusInterval = setInterval(updateServerStatus, 30000); // Update every 30 seconds
     });
@@ -64,7 +74,7 @@
         try {
             await logger.startSession();
             logger.success(`--------------------------------------------------------------------`)
-            logger.success(`* \n${new Date().toLocaleString()} : ${$t('mainContent.launch.launchStatus.preparing')} [ Minecraft ${SERVER_VERSION} - Server: ${SERVER_IP}:${SERVER_PORT} ]\n`)
+            logger.success(`* \n${new Date().toLocaleString()} : ${$t('mainContent.launch.launchStatus.preparing')} [ Minecraft ${serverVersion} - Server: ${serverIp}:${serverPort} ]\n`)
             logger.success(`--------------------------------------------------------------------`)
             launchActions.setLaunching(true);
             launchActions.setStatus('preparing');
@@ -72,15 +82,15 @@
             // Build game arguments with server auto-connect
             let gameArgs = $settings.game.runtime.gameArgs.value ? $settings.game.runtime.gameArgs.value.split(' ') : [];
             // Add server connection arguments
-            gameArgs.push('--server', SERVER_IP);
-            gameArgs.push('--port', String(SERVER_PORT));
+            gameArgs.push('--server', serverIp);
+            gameArgs.push('--port', String(serverPort));
 
             let launchOptions = {
                 url: null,
                 authenticator: getSelectedAccount(),
                 timeout: 10000,
                 path: $settings.storage.directories.minecraftFolder.value,
-                version: SERVER_VERSION,
+                version: serverVersion,
                 detached: $settings.game.runtime.runDetached.value,
                 downloadFileMultiple: 10,
                 intelEnabledMac: $settings.game.runtime.intelEnabledMac.value,
@@ -118,7 +128,7 @@
             </div>
             <div class="server-details">
                 <h2>{$t('server.title')}</h2>
-                <span class="server-address">{SERVER_IP}:{SERVER_PORT}</span>
+                <span class="server-address">{serverIp}:{serverPort}</span>
             </div>
             <div class="server-status-badge" class:online={serverStatus.online} class:offline={!serverStatus.online}>
                 <span class="status-dot"></span>
@@ -140,7 +150,7 @@
             </div>
             <div class="stat-item">
                 <i class="fa fa-cube"></i>
-                <span class="stat-value">{SERVER_VERSION}</span>
+                <span class="stat-value">{serverVersion}</span>
                 <span class="stat-label">{$t('server.version')}</span>
             </div>
         </div>
@@ -178,7 +188,7 @@
                     {#if $isLaunching}
                         {$t(`mainContent.launch.launchStatus.${$launchStatus}`)}
                     {:else if serverStatus.online}
-                        Minecraft {SERVER_VERSION}
+                        Minecraft {serverVersion}
                     {/if}
                 </span>
             </button>

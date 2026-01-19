@@ -1,13 +1,50 @@
 // @ts-nocheck
 import axios from 'axios';
 import { apiBase, starlightBaseURL } from '../utils/helper';
+import { getServerAddress } from './remoteConfig';
 
 export const baseURL = apiBase;
 export const fabricMetaURL = 'https://meta.fabricmc.net/v1/versions';
 
-// Server configuration
-export const SERVER_IP = '179.61.190.50';
-export const SERVER_PORT = 25565;
+// Server configuration - defaults that will be overridden by remote config
+export const DEFAULT_SERVER_IP = '179.61.190.50';
+export const DEFAULT_SERVER_PORT = 25565;
+
+// Dynamic server configuration (will be updated from remote config)
+let currentServerIP = DEFAULT_SERVER_IP;
+let currentServerPort = DEFAULT_SERVER_PORT;
+
+/**
+ * Initialize server configuration from remote config
+ */
+export async function initServerConfig() {
+    try {
+        const address = await getServerAddress();
+        currentServerIP = address.ip;
+        currentServerPort = address.port;
+        console.log(`[API] Server config initialized: ${currentServerIP}:${currentServerPort}`);
+    } catch (error) {
+        console.error('[API] Failed to initialize server config, using defaults:', error);
+    }
+}
+
+/**
+ * Get current server IP
+ */
+export function getServerIP() {
+    return currentServerIP;
+}
+
+/**
+ * Get current server port
+ */
+export function getServerPort() {
+    return currentServerPort;
+}
+
+// Legacy exports for backward compatibility
+export const SERVER_IP = currentServerIP;
+export const SERVER_PORT = currentServerPort;
 
 /**
  * Fetch server status using mcsrvstat.us API
@@ -15,7 +52,10 @@ export const SERVER_PORT = 25565;
  */
 export async function fetchServerStatus() {
     try {
-        const response = await axios.get(`https://api.mcsrvstat.us/2/${SERVER_IP}:${SERVER_PORT}`);
+        // Use dynamic server IP and port
+        const ip = getServerIP();
+        const port = getServerPort();
+        const response = await axios.get(`https://api.mcsrvstat.us/2/${ip}:${port}`);
         const data = response.data;
 
         if (data.online) {
