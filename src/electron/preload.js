@@ -110,6 +110,7 @@ contextBridge.exposeInMainWorld('electron', {
   getMinecraftFolder: () => ipcRenderer.invoke('get-minecraft-path'),
   getBackupFolder: () => ipcRenderer.invoke('get-backup-folder'),
   openFolderInExplorer: (folderPath) => ipcRenderer.invoke('open-folder-in-explorer', folderPath),
+  addServerToList: (minecraftPath, serverName, serverIp) => ipcRenderer.invoke('add-server-to-list', minecraftPath, serverName, serverIp),
   
   // File logging methods
   writeLog: (logEntry) => ipcRenderer.invoke('write-log', logEntry),

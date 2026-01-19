@@ -45,6 +45,7 @@
     "electron-log": "^5.4.3",
     "electron-updater": "^6.6.2",
     "msmc": "^5.0.5",
+    "nbt": "^0.8.1",
     "node-fetch": "^3.3.2",
     "ori-mcc": "^1.0.11",
     "skin3d": "^0.0.12"

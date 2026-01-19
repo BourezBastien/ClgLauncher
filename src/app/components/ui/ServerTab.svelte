@@ -93,6 +93,20 @@
             launchActions.setLaunching(true);
             launchActions.setStatus('preparing');
 
+            // Add server to Minecraft's server list (servers.dat)
+            try {
+                const minecraftFolder = await window.electron.getMinecraftFolder();
+                await window.electron.addServerToList(
+                    minecraftFolder,
+                    'Serveur Club informatique',
+                    `${serverIp}:${serverPort}`
+                );
+                logger.success(`Server added to Minecraft server list`);
+            } catch (serverError) {
+                console.warn('Could not add server to list:', serverError);
+                // Don't fail the launch if adding to server list fails
+            }
+
             // Build game arguments with server auto-connect
             let gameArgs = $settings.game.runtime.gameArgs.value ? $settings.game.runtime.gameArgs.value.split(' ') : [];
 

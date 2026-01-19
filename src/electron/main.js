@@ -20,6 +20,7 @@ const __dirname = path.dirname(__filename);
 import { setAppWindow, getAppWindow, closeAppWindow } from './window/appWindow.js';
 import { Launch } from "ori-mcc";
 import { execSync } from "child_process";
+import { addServerToList } from './utils/serverManager.js';
 // Discord RPC disabled for CLG Launcher
 // import { discordRPC } from './utils/discordRPC.js';
 
@@ -205,6 +206,9 @@ const setupIpcHandlers = () => {
     });
     ipcMain.handle('get-backup-folder', () => {
         return `${rootDirectory}/.OriLauncher/Backup`
+    });
+    ipcMain.handle('add-server-to-list', async (event, minecraftPath, serverName, serverIp) => {
+        return await addServerToList(minecraftPath, serverName, serverIp);
     });
     ipcMain.handle("minimize-app", () => {
         const win = getAppWindow();
