@@ -123,7 +123,7 @@ const buildApp = async () => {
                     perMachine: true,
                     createDesktopShortcut: true,
                     createStartMenuShortcut: true,
-                    artifactName: '${productName}-${version}-setup.${ext}',
+                    artifactName: 'CLG-Launcher-${version}-setup.${ext}',
                     deleteAppDataOnUninstall: false
                 },
                 mac: {
