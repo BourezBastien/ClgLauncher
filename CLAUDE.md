@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 CLG Launcher is a fork of OriLauncher, customized for the Club Informatique du Collège Madame Epinay. It is a cross-platform Minecraft launcher built with Electron and Svelte. Key modifications from upstream:
 - **Offline accounts only** - Microsoft authentication removed
 - **Dedicated server tab** - Auto-connects to 179.61.190.50:25565 with player count display
-- **Minecraft 1.19.4** - Version fixed for server compatibility
+- **Minecraft 1.21.1** - Version for server compatibility
 - **Discord RPC disabled** - Social features removed
 - **French/English** - Bilingual localization
 
@@ -103,7 +103,7 @@ The `build.js` script handles the build process:
 
 ### Important Notes
 - Discord RPC code exists in `src/electron/utils/discordRPC.js` but is disabled in `main.js`
-- Server address (179.61.190.50:25565) and Minecraft version (1.19.4) are hardcoded for the club's server
+- Server address (179.61.190.50:25565) and Minecraft version (1.21.1) are configured for the club's server
 - Window management is modularized in `src/electron/window/appWindow.js`
 
 ## Distribution Policy

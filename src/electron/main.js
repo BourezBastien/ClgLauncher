@@ -30,7 +30,44 @@ autoUpdater.autoInstallOnAppQuit = true;
 autoUpdater.allowPrerelease = true;
 
 const rootDirectory = process.env.APPDATA || (process.platform === 'darwin' ? `${process.env.APPDATA}/Library/Application Support`: process.env.HOME);
-const LOG_DIR = `${rootDirectory}/.OriLauncher/logs`
+const LOG_DIR = `${rootDirectory}/.OriLauncher/logs`;
+const RUNTIME_DIR = `${rootDirectory}/.OriLauncher/.Minecraft/runtime`;
+
+/**
+ * Clean old Java runtimes before launching to prevent corrupted JRE issues
+ */
+async function cleanOldRuntimes() {
+    try {
+        const runtimePath = RUNTIME_DIR;
+
+        // Check if runtime directory exists
+        try {
+            await fs.access(runtimePath);
+        } catch {
+            console.log('[Runtime Cleanup] No runtime directory found, skipping cleanup');
+            return;
+        }
+
+        console.log('[Runtime Cleanup] Cleaning old Java runtimes...');
+        const entries = await fs.readdir(runtimePath, { withFileTypes: true });
+
+        for (const entry of entries) {
+            if (entry.isDirectory()) {
+                const fullPath = path.join(runtimePath, entry.name);
+                try {
+                    await fs.rm(fullPath, { recursive: true, force: true });
+                    console.log(`[Runtime Cleanup] Removed: ${entry.name}`);
+                } catch (err) {
+                    console.error(`[Runtime Cleanup] Failed to remove ${entry.name}:`, err.message);
+                }
+            }
+        }
+
+        console.log('[Runtime Cleanup] Cleanup complete');
+    } catch (error) {
+        console.error('[Runtime Cleanup] Error during cleanup:', error);
+    }
+}
 
 /**
  * Sets up IPC handlers for communication between the main and renderer processes.
@@ -66,7 +103,10 @@ const setupIpcHandlers = () => {
     
         try {
             console.log("======= Starting game launch =======");
-            
+
+            // Clean old runtimes before launching to prevent corrupted JRE issues
+            await cleanOldRuntimes();
+
             launcher.on('progress', (progress, size, element) => {
                 if (!isCancelled) {
                     event.sender.send('launch-progress', { progress, size, element });

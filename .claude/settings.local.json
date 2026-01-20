@@ -22,7 +22,8 @@
       "Bash(git tag:*)",
       "Bash(ls:*)",
       "WebSearch",
-      "mcp__zread__read_file"
+      "mcp__zread__read_file",
+      "Bash(npm run dev:*)"
     ],
     "deny": [],
     "ask": []
