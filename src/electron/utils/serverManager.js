@@ -5,7 +5,7 @@
 
 import fs from 'fs/promises';
 import path from 'path';
-import { nbt } from 'nbt';
+import nbt from 'nbt';
 
 /**
  * Add a server to Minecraft's server list (servers.dat)
@@ -18,22 +18,14 @@ export async function addServerToList(minecraftPath, serverName, serverIp, resou
     try {
         const serversDatPath = path.join(minecraftPath, 'servers.dat');
 
-        let serversData = {
-            data: {
-                servers: {
-                    type: 'list',
-                    value: []
-                }
-            }
-        };
+        let serversList = [];
 
         // Try to read existing servers.dat
         try {
             const existingData = await fs.readFile(serversDatPath);
-            // Parse NBT data (gzipped)
             const nbtData = await parseNBTData(existingData);
-            if (nbtData && nbtData.servers) {
-                serversData.data.servers.value = nbtData.servers;
+            if (nbtData && nbtData.servers && nbtData.servers.value) {
+                serversList = nbtData.servers.value;
             }
         } catch (error) {
             // File doesn't exist or is invalid, start with empty list
@@ -41,27 +33,27 @@ export async function addServerToList(minecraftPath, serverName, serverIp, resou
         }
 
         // Check if server already exists
-        const existingServer = serversData.data.servers.value.find(
-            server => server.ip.value === serverIp
+        const existingServerIndex = serversList.findIndex(
+            server => server.ip && server.ip.value === serverIp
         );
 
-        if (existingServer) {
+        if (existingServerIndex !== -1) {
             console.log(`[ServerManager] Server ${serverIp} already exists, updating name`);
-            existingServer.name.value = serverName;
-            existingServer.accept.value = resourcePack ? 1 : 0;
+            serversList[existingServerIndex].name.value = serverName;
+            if (serversList[existingServerIndex].acceptTextures) {
+                serversList[existingServerIndex].acceptTextures.value = resourcePack ? 1 : 0;
+            }
         } else {
             // Add new server
             console.log(`[ServerManager] Adding server ${serverName} (${serverIp})`);
-            serversData.data.servers.value.push({
+            serversList.push({
                 name: { type: 'string', value: serverName },
-                ip: { type: 'string', value: serverIp },
-                icon: { type: 'byteArray', value: [] },
-                accept: { type: 'byte', value: resourcePack ? 1 : 0 }
+                ip: { type: 'string', value: serverIp }
             });
         }
 
         // Write the servers.dat file
-        const nbtBuffer = await encodeNBTData(serversData.data);
+        const nbtBuffer = await encodeNBTData(serversList);
         await fs.writeFile(serversDatPath, nbtBuffer);
 
         console.log(`[ServerManager] Server list saved to ${serversDatPath}`);
@@ -77,36 +69,41 @@ export async function addServerToList(minecraftPath, serverName, serverIp, resou
  */
 async function parseNBTData(buffer) {
     return new Promise((resolve, reject) => {
-        try {
-            const nbtReader = new nbt.Reader(buffer, (error, result) => {
-                if (error) {
-                    reject(error);
-                } else {
-                    resolve(result);
-                }
-            });
-        } catch (error) {
-            reject(error);
-        }
+        nbt.parse(buffer, (error, result) => {
+            if (error) {
+                reject(error);
+            } else {
+                resolve(result.value);
+            }
+        });
     });
 }
 
 /**
  * Encode NBT data to buffer (gzipped)
  */
-async function encodeNBTData(data) {
+async function encodeNBTData(serversList) {
     return new Promise((resolve, reject) => {
-        try {
-            const nbtWriter = new nbt.Writer(data, (error, buffer) => {
-                if (error) {
-                    reject(error);
-                } else {
-                    resolve(buffer);
+        const nbtData = {
+            name: '',
+            value: {
+                servers: {
+                    type: 'list',
+                    value: {
+                        type: 'compound',
+                        value: serversList
+                    }
                 }
-            });
-        } catch (error) {
-            reject(error);
-        }
+            }
+        };
+
+        nbt.write(nbtData, (error, buffer) => {
+            if (error) {
+                reject(error);
+            } else {
+                resolve(buffer);
+            }
+        });
     });
 }
 
@@ -119,21 +116,22 @@ export async function removeServerFromList(minecraftPath, serverIp) {
         const existingData = await fs.readFile(serversDatPath);
         const nbtData = await parseNBTData(existingData);
 
-        if (!nbtData || !nbtData.servers) {
+        if (!nbtData || !nbtData.servers || !nbtData.servers.value) {
             return false;
         }
 
-        // Filter out the server
-        const originalLength = nbtData.servers.length;
-        nbtData.servers = nbtData.servers.filter(server => server.ip.value !== serverIp);
+        let serversList = nbtData.servers.value;
 
-        if (nbtData.servers.length === originalLength) {
+        // Filter out the server
+        const originalLength = serversList.length;
+        serversList = serversList.filter(server => server.ip && server.ip.value !== serverIp);
+
+        if (serversList.length === originalLength) {
             return false; // Server not found
         }
 
         // Write back
-        const newData = { servers: nbtData.servers };
-        const nbtBuffer = await encodeNBTData(newData);
+        const nbtBuffer = await encodeNBTData(serversList);
         await fs.writeFile(serversDatPath, nbtBuffer);
 
         return true;
@@ -152,14 +150,14 @@ export async function getServersList(minecraftPath) {
         const existingData = await fs.readFile(serversDatPath);
         const nbtData = await parseNBTData(existingData);
 
-        if (!nbtData || !nbtData.servers) {
+        if (!nbtData || !nbtData.servers || !nbtData.servers.value) {
             return [];
         }
 
-        return nbtData.servers.map(server => ({
-            name: server.name.value,
-            ip: server.ip.value,
-            accept: server.accept.value === 1
+        return nbtData.servers.value.map(server => ({
+            name: server.name ? server.name.value : 'Unknown',
+            ip: server.ip ? server.ip.value : '',
+            acceptTextures: server.acceptTextures ? server.acceptTextures.value === 1 : false
         }));
     } catch (error) {
         console.error('[ServerManager] Error reading servers:', error);

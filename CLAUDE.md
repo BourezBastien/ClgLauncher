@@ -30,14 +30,15 @@ Development runs Vite at `http://localhost:5173`, then Electron launches once th
 
 ### Process Model
 - **Main Process** (`src/electron/main.js`): IPC handlers, game launch orchestration via `ori-mcc`, account management via `msmc`, Discord RPC, file I/O
-- **Preload** (`src/electron/preload.js`): Context bridge exposing `window.electronAPI` to renderer
+- **Preload** (`src/electron/preload.js`): Context bridge exposing `window.electron` to renderer
 - **Renderer** (`src/app/`): Svelte 5 frontend with components, stores, and services
 
 ### Key IPC Events
 - `launch-game`, `cancel-launch` - Game launch control
-- `launch-progress`, `launch-data`, `launch-complete`, `error` - Launch status events
-- `get-accounts`, `add-account`, `remove-account` - Account management
-- `get-settings`, `set-settings` - Settings persistence
+- `launch-progress`, `launch-data`, `launch-complete`, `launch-close`, `launch-cancelled`, `error` - Launch status events
+- `add-account`, `refresh-account` - Account management (offline only)
+- `check-for-updates`, `install-update`, `update-status` - Auto-updater control
+- `add-server-to-list` - Adds CLG server to Minecraft's servers.dat
 
 ### State Management
 Svelte stores in `src/app/stores/`:
@@ -58,6 +59,13 @@ Svelte stores in `src/app/stores/`:
 - `discord-rpc` - DISABLED in this fork (code remains but unused)
 - `skin3d` - 3D player skin viewer
 - `electron-updater` - Auto-update from GitHub releases (prereleases enabled)
+- `nbt` - NBT parsing for servers.dat manipulation
+
+### Data Paths
+All launcher data is stored in `{APPDATA}/.OriLauncher/`:
+- `.Minecraft/` - Minecraft game files, instances, mods
+- `logs/` - Session log files
+- `Backup/` - User backups
 
 ## Localization
 
