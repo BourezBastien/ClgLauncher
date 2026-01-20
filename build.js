@@ -73,7 +73,6 @@ const buildApp = async () => {
                 forceCodeSigning: false,
                 afterSign: null,
                 afterPack: setExeIcon,
-                publish: null,
                 artifactName: '${productName}-${version}-${os}-${arch}.${ext}',
                 extraMetadata: {
                     main: 'appsrc/electron/main.js'
